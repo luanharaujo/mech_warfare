@@ -7,12 +7,15 @@
 #include <math.h>
 #include "jstick.c"
 
+#define DEBUG_JS 0
+
 int keep_running = 1;	// end of program flag. it is controlled by the
 						// joystick thread. if set to 0, all threads will
 						// finish up and set their own flags to 1 so that
 						// the main program can clean everything up and end.
 
 int joystick_finished = 1;
+int mira_finished = 1;
 
 int shutdown_flag = 0, reboot = 0, close_program=0;	// flags set by joystick
 													// commands so that the
@@ -58,12 +61,12 @@ PI_THREAD(joystick)
 	piHiPri(0);
 
     init_joystick(&js, devname);
-    init_print_js();
+    if(DEBUG_JS) init_print_js();
  
 	// START+SELECT finishes the program
     while((!(js.select && js.start)) && (keep_running)) 
     {
-		update_print_js();
+		if(DEBUG_JS) update_print_js();
 		if(js.disconnect)
         {
         	//conectar novamente caso desconect
@@ -85,6 +88,49 @@ PI_THREAD(joystick)
 	joystick_finished = 1;
 }
 
+#define DIR 37
+#define STEP 35 
+#define MOD0 11
+#define MOD1 13
+#define MOD2 15
+
+#define PERIOD 10
+
+
+PI_THREAD(mira)
+{
+    mira_finished = 0;
+	piHiPri(0);
+
+	//void setup
+	pinMode(DIR, OUTPUT);
+	pinMode(STEP, OUTPUT);
+	pinMode(MOD0, OUTPUT);
+	pinMode(MOD1, OUTPUT);
+	pinMode(MOD2, OUTPUT);
+
+	//setep
+	digitalWrite(MOD0, LOW);
+	digitalWrite(MOD1, LOW);
+	digitalWrite(MOD2, LOW);
+
+	//direção
+	digitalWrite(DIR, LOW);
+	//digitalWrite(DIR, HIGH);
+
+    while(keep_running)
+    {
+		//void loop
+		digitalWrite(STEP, HIGH);
+		delay(PERIOD/2);
+		digitalWrite(STEP, LOW);
+		delay(PERIOD/2);
+
+	}
+	
+	mira_finished = 1;
+}
+
 
 
 int am_i_su()
@@ -99,7 +145,7 @@ void clean_up()
 	int nao_terminou = 1;
 	
 	do {
-		nao_terminou = !(joystick_finished); 
+		nao_terminou = !(joystick_finished && mira_finished); 
 		/*
 		printf("%d...", main_finished);
 		printf("%d...", joystick_finished);
@@ -129,6 +175,7 @@ int main(int argc, char* argv[])
 
 	
 	piThreadCreate(joystick);
+	piThreadCreate(mira);
 
 
 	while(keep_running) delay(100);
