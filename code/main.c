@@ -7,7 +7,7 @@
 #include <math.h>
 #include "jstick.c"
 
-#define DEBUG_JS 0
+#define DEBUG_JS 1
 
 int keep_running = 1;	// end of program flag. it is controlled by the
 						// joystick thread. if set to 0, all threads will
@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
 
 	
 	piThreadCreate(joystick);
-	piThreadCreate(mira);
+	//piThreadCreate(mira);
 
 
 	while(keep_running) delay(100);

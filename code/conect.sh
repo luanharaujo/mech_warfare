@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ip_rasp="192.168.200.1"
+ip_rasp="192.168.1.111"
 
 
 login_rasp="pi"
