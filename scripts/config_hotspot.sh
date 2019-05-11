@@ -12,6 +12,7 @@ then
 ./config_hotspot.sh nome_da_rede senha_da_rede'
 
 else
+apt-get	update -y
 apt-get install rcs -y
 apt-get install	dnsmasq -y
 apt-get install hostapd -y
@@ -829,5 +830,17 @@ fi
 exit 0
 '
 
-reboot
+echo Reiniciando o rasp em:
+echo 5
+sleep 1
+echo 4
+sleep 1
+echo 3
+sleep 1
+echo 2
+sleep 1
+echo 1
+sleep 1
+echo Fui!
+shutdown -r now
 fi
